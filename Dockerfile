@@ -1,5 +1,6 @@
 FROM gethue/hue
 
+USER root
 RUN sed -i 's/security.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 
@@ -23,7 +24,7 @@ dpkg-reconfigure -f noninteractive tzdata
 ADD packages/*gz /usr/local/
 
 # zookeeper
-RUN mv /usr/local/apache-zookeeper-3.5.6-bin /usr/local/zookeeper
+RUN mv /usr/local/apache-zookeeper-3.5.9-bin /usr/local/zookeeper
 RUN mkdir /var/lib/zookeeper
 RUN sed "s#/tmp/zookeeper#/var/lib/zookeeper#" /usr/local/zookeeper/conf/zoo_sample.cfg > /usr/local/zookeeper/conf/zoo.cfg
 
@@ -31,7 +32,7 @@ RUN sed "s#/tmp/zookeeper#/var/lib/zookeeper#" /usr/local/zookeeper/conf/zoo_sam
 # hadoop
 RUN mv /usr/local/hadoop-3.1.4 /usr/local/hadoop
 RUN ln -s /usr/local/hadoop/etc/hadoop /etc/hadoop
-RUN mkdir -p /usr/local/hadoop/data/{namenode,datanode} /etc/hadoop-httpfs/conf/
+RUN mkdir -p /usr/local/hadoop/data/namenode /usr/local/hadoop/data/datanode /usr/local/hadoop/logs /etc/hadoop-httpfs/conf/
 
 RUN echo "\nStrictHostKeyChecking no\nUserKnownHostsFile" >> /etc/ssh/ssh_config && \
 addgroup hadoop && \
@@ -40,7 +41,7 @@ echo "hadoop ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
 su hadoop -c "ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys" && \
 echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> /etc/hadoop/hadoop-env.sh && \
 echo "bigdata" > /etc/hadoop/workers && \
-chown -R hadoop:hadoop /usr/local/hadoop
+chown -R hadoop:hadoop /usr/local/hadoop/data /usr/local/hadoop/logs
 
 
 ENV HADOOP_HOME=/usr/local/hadoop
@@ -56,7 +57,7 @@ ADD conf/hadoop /etc/hadoop
 ADD conf/httpfs/httpfs-site.xml /etc/hadoop-httpfs/conf/
 
 # Spark
-RUN mv /usr/local/spark-2.4.4-bin-hadoop2.7 /usr/local/spark && \
+RUN mv /usr/local/spark-2.4.7-bin-hadoop2.7 /usr/local/spark && \
 ln -s /usr/local/spark/conf /etc/spark
 ADD conf/spark /etc/spark
 RUN cp /usr/local/spark/conf/log4j.properties.template /usr/local/spark/conf/log4j.properties
@@ -65,7 +66,7 @@ RUN ln -s /usr/local/hive/conf/hive-site.xml /usr/local/spark/conf/hive-site.xml
 RUN sed -i 's/log4j.rootCategory=INFO, console/log4j.rootCategory=WARN,console/' /usr/local/spark/conf/log4j.properties
 
 # Kafka
-RUN mv /usr/local/kafka_2.11-2.3.1 /usr/local/kafka && \
+RUN mv /usr/local/kafka_2.12-2.6.1 /usr/local/kafka && \
 ln -s /usr/local/kafka/config /etc/kafka
 ADD conf/kafka/server.properties /etc/kafka
 RUN mkdir /usr/local/kafka/data /usr/local/kafka/log
@@ -92,7 +93,7 @@ ADD conf/hue /usr/share/hue/desktop/conf
 RUN chown -R mysql:mysql /var/lib/mysql
 
 # Flink
-RUN mv /usr/local/flink-1.9.1 /usr/local/flink
+RUN mv /usr/local/flink-1.12.1 /usr/local/flink
 ADD packages/flink-hadoop-uber.jar /usr/local/flink/lib/
 
 # PATH

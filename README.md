@@ -10,13 +10,13 @@
 | :-----------: | :----------: |
 |   基础镜像    | ubuntu:18.04 |
 |    Hadoop     |    3.1.4     |
-|     Spark     |    2.4.4     |
+|     Spark     |    2.4.7     |
 | Hive (on Tez) |    3.1.2     |
 |      Tez      |    0.9.2     |
 |      Hue      |    4.5.0     |
-|     Flink     |    1.9.1     |
-|   Zookeeper   |    3.5.6     |
-|     Kafka     |    2.3.1     |
+|     Flink     |    1.12.1     |
+|   Zookeeper   |    3.5.9     |
+|     Kafka     |    2.6.1     |
 |     MySQL     |     5.7      |
 
 ## 2. 启动说明
